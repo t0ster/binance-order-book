@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     STATIC_DIR: Path = APP_DIR / "static"
     TEMPLATE_DIR: Path = APP_DIR / "templates"
 
+    SYMBOL: str = "BTC/USDT"
+
 
 settings = Settings()  # type: ignore
 templates = Jinja2Blocks(directory=settings.TEMPLATE_DIR)

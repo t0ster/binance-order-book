@@ -9,14 +9,15 @@ import websockets
 from book.domain import OrderBook
 
 
-async def get_order_book_snapshot() -> OrderBook:
-    order_book = await _get_order_book_snapshot()
-    return _make_model(order_book)
+async def get_order_book_snapshot(symbol: str) -> OrderBook:
+    order_book = await _get_order_book_snapshot(symbol)
+    return _make_model(order_book, symbol)
 
 
-def _make_model(order_book: dict) -> OrderBook:
+def _make_model(order_book: dict, symbol: str) -> OrderBook:
     return OrderBook.model_validate(
         {
+            "symbol": symbol,
             "bids": [
                 {"price": price, "size": quantity}
                 for price, quantity in order_book["bids"].items()
@@ -29,8 +30,9 @@ def _make_model(order_book: dict) -> OrderBook:
     )
 
 
-async def _get_order_book_snapshot():
-    uri = "https://www.binance.com/api/v3/depth?symbol=BTCUSDT&limit=500"
+async def _get_order_book_snapshot(symbol: str) -> dict:
+    _symbol = symbol.replace("/", "").upper()
+    uri = f"https://www.binance.com/api/v3/depth?symbol={_symbol}&limit=500"
 
     async with aiohttp.ClientSession() as session:
         response = await session.get(uri)
@@ -40,8 +42,9 @@ async def _get_order_book_snapshot():
         return order_book
 
 
-async def stream_order_book() -> AsyncIterator[OrderBook]:
-    uri = "wss://stream.binance.com:9443/ws/btcusdt@depth"
+async def stream_order_book(symbol: str) -> AsyncIterator[OrderBook]:
+    _symbol = symbol.replace("/", "").lower()
+    uri = f"wss://stream.binance.com:9443/ws/{_symbol}@depth"
 
     order_book = None
     events_buffer = []
@@ -58,20 +61,20 @@ async def stream_order_book() -> AsyncIterator[OrderBook]:
 
             # buffer 5 seconds of events
             if time() - start > 5 and not order_book:
-                order_book = await _get_order_book_snapshot()
+                order_book = await _get_order_book_snapshot(symbol)
                 for event in events_buffer:
                     order_book = _update_order_book(order_book, event)
-                yield _make_model(order_book)
+                yield _make_model(order_book, symbol)
                 continue
 
             if not order_book:
                 continue
 
             order_book = _update_order_book(order_book, event)
-            yield _make_model(order_book)
+            yield _make_model(order_book, symbol)
 
 
-def _update_order_book(order_book, event):
+def _update_order_book(order_book, event) -> dict:
     if event["u"] <= order_book["lastUpdateId"]:
         return order_book
 

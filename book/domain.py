@@ -9,5 +9,6 @@ class PriceLevel(BaseModel):
 
 
 class OrderBook(BaseModel):
+    symbol: str
     bids: list[PriceLevel]
     asks: list[PriceLevel]
