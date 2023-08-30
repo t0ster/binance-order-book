@@ -13,10 +13,10 @@
                 </tr>
             </thead>
             <tbody>
-                {% for price, qty in order_book.bids.items() %}
-                <tr id="bid-{{ price }}">
-                    <td class="py-2 px-4 border bg-green-100">{{ price }}</td>
-                    <td class="py-2 px-4 border bg-green-100">{{ qty }}</td>
+                {% for level in order_book.bids %}
+                <tr id="bid-{{ level.price }}">
+                    <td class="py-2 px-4 border bg-green-100">{{ level.price }}</td>
+                    <td class="py-2 px-4 border bg-green-100">{{ level.size }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -34,10 +34,10 @@
                 </tr>
             </thead>
             <tbody>
-                {% for price, qty in order_book.asks.items() %}
-                <tr id="ask-{{ price }}">
-                    <td class="py-2 px-4 border bg-red-100">{{ price }}</td>
-                    <td class="py-2 px-4 border bg-red-100">{{ qty }}</td>
+                {% for level in order_book.asks %}
+                <tr id="ask-{{ level.price }}">
+                    <td class="py-2 px-4 border bg-red-100">{{ level.price }}</td>
+                    <td class="py-2 px-4 border bg-red-100">{{ level.size }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

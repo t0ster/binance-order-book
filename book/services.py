@@ -1,12 +1,35 @@
 import json
 from copy import deepcopy
 from time import time
+from typing import AsyncIterator
 
 import aiohttp
 import websockets
 
+from book.domain import OrderBook
 
-async def get_order_book_snapshot():
+
+async def get_order_book_snapshot() -> OrderBook:
+    order_book = await _get_order_book_snapshot()
+    return _make_model(order_book)
+
+
+def _make_model(order_book: dict) -> OrderBook:
+    return OrderBook.model_validate(
+        {
+            "bids": [
+                {"price": price, "size": quantity}
+                for price, quantity in order_book["bids"].items()
+            ],
+            "asks": [
+                {"price": price, "size": quantity}
+                for price, quantity in order_book["asks"].items()
+            ],
+        }
+    )
+
+
+async def _get_order_book_snapshot():
     uri = "https://www.binance.com/api/v3/depth?symbol=BTCUSDT&limit=500"
 
     async with aiohttp.ClientSession() as session:
@@ -17,14 +40,14 @@ async def get_order_book_snapshot():
         return order_book
 
 
-async def stream_order_book():
+async def stream_order_book() -> AsyncIterator[OrderBook]:
     uri = "wss://stream.binance.com:9443/ws/btcusdt@depth"
 
     order_book = None
     events_buffer = []
     start = time()
 
-    async with websockets.connect(uri) as websocket:
+    async with websockets.connect(uri) as websocket:  # type: ignore
         async for event in websocket:
             event = json.loads(event)
             event["a"] = dict(event["a"])
@@ -35,17 +58,17 @@ async def stream_order_book():
 
             # buffer 5 seconds of events
             if time() - start > 5 and not order_book:
-                order_book = await get_order_book_snapshot()
+                order_book = await _get_order_book_snapshot()
                 for event in events_buffer:
                     order_book = _update_order_book(order_book, event)
-                yield order_book
+                yield _make_model(order_book)
                 continue
 
             if not order_book:
                 continue
 
             order_book = _update_order_book(order_book, event)
-            yield order_book
+            yield _make_model(order_book)
 
 
 def _update_order_book(order_book, event):
