@@ -1,0 +1,114 @@
+{% extends "/_base.html" %}
+
+{% block order_book %}
+<div class="flex">
+    <!-- Buy orders -->
+    <div class="w-1/2">
+        <h2 class="text-xl mb-2">Buy Orders</h2>
+        <table class="min-w-full">
+            <thead>
+                <tr>
+                    <th class="py-2 px-4 border">Price</th>
+                    <th class="py-2 px-4 border">Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for price, qty in order_book.bids.items() %}
+                <tr id="bid-{{ price }}">
+                    <td class="py-2 px-4 border bg-green-100">{{ price }}</td>
+                    <td class="py-2 px-4 border bg-green-100">{{ qty }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Sell orders -->
+    <div class="w-1/2 ml-4">
+        <h2 class="text-xl mb-2">Sell Orders</h2>
+        <table class="min-w-full">
+            <thead>
+                <tr>
+                    <th class="py-2 px-4 border">Price</th>
+                    <th class="py-2 px-4 border">Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for price, qty in order_book.asks.items() %}
+                <tr id="ask-{{ price }}">
+                    <td class="py-2 px-4 border bg-red-100">{{ price }}</td>
+                    <td class="py-2 px-4 border bg-red-100">{{ qty }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% macro placeholder() -%}
+<div class="flex animate-pulse">
+    <div class="flex-shrink-0">
+        <span class="w-12 h-12 block bg-gray-200 rounded-full dark:bg-gray-700"></span>
+    </div>
+
+    <div class="ml-4 mt-2 w-full">
+        <h3 class="h-4 bg-gray-200 rounded-md dark:bg-gray-700" style="width: 40%;"></h3>
+
+        <ul class="mt-5 space-y-3">
+            <li class="w-full h-4 bg-gray-200 rounded-md dark:bg-gray-700"></li>
+            <li class="w-full h-4 bg-gray-200 rounded-md dark:bg-gray-700"></li>
+            <li class="w-full h-4 bg-gray-200 rounded-md dark:bg-gray-700"></li>
+            <li class="w-full h-4 bg-gray-200 rounded-md dark:bg-gray-700"></li>
+        </ul>
+    </div>
+</div>
+{%- endmacro %}
+
+{% block header %}
+Binance Order Book :: Symbol: {{ symbol }}
+{% endblock %}
+
+{% block content %}
+<div hx-ext="sse,morph" sse-connect="/stream" sse-swap="message" hx-swap="morph:innerHTML">
+    <div class="flex">
+        <div class="w-1/2">
+            <h2 class="text-xl mb-2">Buy Orders</h2>
+            <table class="min-w-full">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-4 border">Price</th>
+                        <th class="py-2 px-4 border">Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="py-2 px-4 border bg-green-100" colspan="2">
+                            {{ placeholder() }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="w-1/2 ml-4">
+            <h2 class="text-xl mb-2">Sell Orders</h2>
+            <table class="min-w-full">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-4 border">Price</th>
+                        <th class="py-2 px-4 border">Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="py-2 px-4 border bg-red-100" colspan="2">
+                            {{ placeholder() }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
