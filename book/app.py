@@ -11,10 +11,6 @@ from book.routes import router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Context manager for FastAPI app. It will run all code before `yield`
-    on app startup, and will run code after `yeld` on app shutdown.
-    """
-
     try:
         subprocess.run(
             [
@@ -40,7 +36,6 @@ app = FastAPI(
 )
 
 app.mount("/static", StaticFiles(directory=settings.STATIC_DIR), name="static")
-
 app.include_router(router)
 
 

@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Roman Dolgyi <tosters@gmail.com>"]
 readme = "README.md"
-packages = [{include = "binance_order_book"}]
+packages = [{include = "book"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
