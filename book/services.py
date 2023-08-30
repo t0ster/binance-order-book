@@ -7,7 +7,7 @@ import websockets
 
 
 async def get_order_book_snapshot():
-    uri = "https://www.binance.com/api/v3/depth?symbol=BTCUSDT&limit=100"
+    uri = "https://www.binance.com/api/v3/depth?symbol=BTCUSDT&limit=500"
 
     async with aiohttp.ClientSession() as session:
         response = await session.get(uri)
