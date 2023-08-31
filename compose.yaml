@@ -1,0 +1,12 @@
+services:
+  mongodb:
+    image: mongo:6.0.3
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+      - ./config/rs-initiate.js:/docker-entrypoint-initdb.d/rs-initiate.js
+    command: ["--replSet", "dbrs", "--bind_ip_all"]
+volumes:
+  mongodata:
+    driver: local

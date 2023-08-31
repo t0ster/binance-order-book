@@ -1,12 +1,11 @@
-import json
 from copy import deepcopy
 from time import time
 from typing import AsyncIterator
 
 import aiohttp
-import websockets
 
 from book.domain import OrderBook
+from book.events import consume
 
 
 async def get_order_book_snapshot(symbol: str) -> OrderBook:
@@ -43,38 +42,33 @@ async def _get_order_book_snapshot(symbol: str) -> dict:
 
 
 async def stream_order_book(symbol: str) -> AsyncIterator[OrderBook]:
-    _symbol = symbol.replace("/", "").lower()
-    uri = f"wss://stream.binance.com:9443/ws/{_symbol}@depth"
-
     order_book = None
     events_buffer = []
     start = time()
 
-    async with websockets.connect(uri) as websocket:  # type: ignore
-        async for event in websocket:
-            event = json.loads(event)
-            event["a"] = dict(event["a"])
-            event["b"] = dict(event["b"])
+    async for event in consume("orderbook_updated", {"symbol": symbol}):
+        event.data["payload"]["a"] = dict(event.data["payload"]["a"])
+        event.data["payload"]["b"] = dict(event.data["payload"]["b"])
 
-            if not order_book:
-                events_buffer.append(event)
+        if not order_book:
+            events_buffer.append(event)
 
-            # buffer 5 seconds of events
-            if time() - start > 5 and not order_book:
-                order_book = await _get_order_book_snapshot(symbol)
-                for event in events_buffer:
-                    order_book = _update_order_book(order_book, event)
-                yield _make_model(order_book, symbol)
-                continue
-
-            if not order_book:
-                continue
-
-            order_book = _update_order_book(order_book, event)
+        # buffer 5 seconds of events
+        if time() - start > 5 and not order_book:
+            order_book = await _get_order_book_snapshot(symbol)
+            for event in events_buffer:
+                order_book = _update_order_book(order_book, event.data["payload"])
             yield _make_model(order_book, symbol)
+            continue
+
+        if not order_book:
+            continue
+
+        order_book = _update_order_book(order_book, event.data["payload"])
+        yield _make_model(order_book, symbol)
 
 
-def _update_order_book(order_book, event) -> dict:
+def _update_order_book(order_book, event: dict) -> dict:
     if event["u"] <= order_book["lastUpdateId"]:
         return order_book
 
