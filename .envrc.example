@@ -1,2 +1,4 @@
 use_nix
 source $(poetry env info --path)/bin/activate
+
+export ENV=development
