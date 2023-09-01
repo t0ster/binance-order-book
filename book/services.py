@@ -10,10 +10,10 @@ from book.events import consume
 
 async def get_order_book_snapshot(symbol: str) -> OrderBook:
     order_book = await _get_order_book_snapshot(symbol)
-    return _make_model(order_book, symbol)
+    return _to_entity(order_book, symbol)
 
 
-def _make_model(order_book: dict, symbol: str) -> OrderBook:
+def _to_entity(order_book: dict, symbol: str) -> OrderBook:
     return OrderBook.model_validate(
         {
             "symbol": symbol,
@@ -58,14 +58,14 @@ async def stream_order_book(symbol: str) -> AsyncIterator[OrderBook]:
             order_book = await _get_order_book_snapshot(symbol)
             for event in events_buffer:
                 order_book = _update_order_book(order_book, event.data["payload"])
-            yield _make_model(order_book, symbol)
+            yield _to_entity(order_book, symbol)
             continue
 
         if not order_book:
             continue
 
         order_book = _update_order_book(order_book, event.data["payload"])
-        yield _make_model(order_book, symbol)
+        yield _to_entity(order_book, symbol)
 
 
 def _update_order_book(order_book, event: dict) -> dict:

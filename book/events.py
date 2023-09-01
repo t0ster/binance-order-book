@@ -40,7 +40,6 @@ async def consume(event_name: str, data_match: dict = {}):
     except PyMongoError:
         if resume_token is None:
             raise
-        else:
-            async with collection.watch(pipeline, resume_after=resume_token) as stream:
-                async for insert_change in stream:
-                    yield transform(insert_change["fullDocument"])
+        async with collection.watch(pipeline, resume_after=resume_token) as stream:
+            async for insert_change in stream:
+                yield transform(insert_change["fullDocument"])
