@@ -1,4 +1,22 @@
 services:
+  app:
+    image: "t0ster/binance-order-book"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - worker
+    environment:
+      SYMBOL: "${SYMBOL:-BTC/USDT}"
+      MONGO_DSN: "${MONGO_DSN:-mongodb://mongodb:27017/?directConnection=true}"
+    command: uvicorn book.app:app --host 0.0.0.0
+
+  worker:
+    image: "t0ster/binance-order-book"
+    environment:
+      SYMBOL: "${SYMBOL:-BTC/USDT}"
+      MONGO_DSN: "${MONGO_DSN:-mongodb://mongodb:27017/?directConnection=true}"
+    command: python book/worker.py
+
   mongodb:
     image: mongo:6.0.3
     ports:
@@ -7,6 +25,7 @@ services:
       - mongodata:/data/db
       - ./config/rs-initiate.js:/docker-entrypoint-initdb.d/rs-initiate.js
     command: ["--replSet", "dbrs", "--bind_ip_all"]
+
 volumes:
   mongodata:
     driver: local

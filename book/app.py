@@ -28,11 +28,11 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    lifespan=lifespan,
     default_response_class=HTMLResponse,
     openapi_url=None,
     docs_url=None,
     redoc_url=None,
+    lifespan=lifespan if settings.ENV == "development" else None,
 )
 
 app.mount("/static", StaticFiles(directory=settings.STATIC_DIR), name="static")

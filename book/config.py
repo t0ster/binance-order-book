@@ -9,6 +9,7 @@ APP_DIR = Path(__file__).resolve().parent
 
 
 class Settings(BaseSettings):
+    ENV: str = "production"
     APP_DIR: Path = APP_DIR
     STATIC_DIR: Path = APP_DIR / "static"
     TEMPLATE_DIR: Path = APP_DIR / "templates"
