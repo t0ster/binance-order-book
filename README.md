@@ -39,6 +39,8 @@ make run SYMBOL=ETH/USDT
 | `DB_NAME`   | default `book`                                                          |
 | `ENV`       | default `production`                                                    |
 
+`?directConnection=true` is required for local mongo deployment because it is deployed as single node replica set, which is required to enable oplog (for watch functionality)
+
 ## Development
 
 ```

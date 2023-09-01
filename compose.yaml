@@ -1,6 +1,6 @@
 services:
   app:
-    image: "t0ster/binance-order-book"
+    image: "t0ster/binance-order-book:9196b3a"
     ports:
       - "8000:8000"
     depends_on:
@@ -11,7 +11,7 @@ services:
     command: uvicorn book.app:app --host 0.0.0.0
 
   worker:
-    image: "t0ster/binance-order-book"
+    image: "t0ster/binance-order-book:9196b3a"
     environment:
       SYMBOL: "${SYMBOL:-BTC/USDT}"
       MONGO_DSN: "${MONGO_DSN:-mongodb://mongodb:27017/?directConnection=true}"
