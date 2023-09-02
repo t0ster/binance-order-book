@@ -52,6 +52,7 @@ make run SYMBOL=ETH/USDT
 ```
 poetry install
 make dev # run in another terminal, this will start mongodb via docker-compose
+poetry shell # activates virtualenv
 python book/worker.py # run in another terminal, starts worker that consumes binance order book diff events and stores them in DB
 ENV=development uvicorn book.app:app --reload-include '*.html' --reload
 ```
