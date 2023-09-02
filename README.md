@@ -62,5 +62,5 @@ ENV=development uvicorn book.app:app --reload-include '*.html' --reload
 To run tests:
 
 ```
-pytests
+pytest
 ```
