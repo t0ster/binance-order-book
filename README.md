@@ -11,10 +11,11 @@
 - The whole order book is updated and rendered on server and sent to client via SSE
   - This is done for simplicity
   - Networking efficiency could be improved by sending order book diffs and merging them on client side
-- Uses HTMX for rich UI, this is done for simplicity and the author's reluctance to write javascript
-  - HTMX allows to write UIs of almost the same complexity as frontend frameworks (like react, vue, etc) but much faster and with much lesser code and dependencies
+- Uses HTMX on frontend
+  - HTMX is a simple and elegant solution that allows to write UIs of almost the same complexity as frontend frameworks (like react, vue, etc) but much faster and with much lesser code and dependencies
 - Order book diff events are persisted in MongoDB
   - Uses [MongoDB watch](https://www.mongodb.com/docs/manual/reference/method/db.collection.watch/) mechanism to consume events and stream them to client
+- If tests pass docker images are built automatically by GithHub action and uploaded to Docker Hub
 
 ## Running
 
@@ -48,4 +49,12 @@ poetry install
 make dev # run in another terminal, this will start mongodb via docker-compose
 python book/worker.py # run in another terminal, starts worker that consumes binance order book diff events and stores them in DB
 ENV=development uvicorn book.app:app --reload-include '*.html' --reload
+```
+
+Open http://localhost:8000
+
+To run tests:
+
+```
+pytests
 ```
