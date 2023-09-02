@@ -30,6 +30,8 @@ To run production build do the following. This will fetch pre-built images from 
 make run
 ```
 
+Open http://localhost:8000
+
 You can also specify symbol for order book:
 
 ```
@@ -56,8 +58,6 @@ poetry shell # activates virtualenv
 python book/worker.py # run in another terminal, starts worker that consumes binance order book diff events and stores them in DB
 ENV=development uvicorn book.app:app --reload-include '*.html' --reload
 ```
-
-Open http://localhost:8000
 
 To run tests:
 
