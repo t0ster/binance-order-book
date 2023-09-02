@@ -16,6 +16,10 @@
 - Order book diff events are persisted in MongoDB
   - This could be used to "replay" order book or build a heatmap (not implemented)
   - Uses [MongoDB watch](https://www.mongodb.com/docs/manual/reference/method/db.collection.watch/) mechanism to consume events and stream them to client
+    - This could be useful to prevent hitting API rate limits, however may increase latency a little bit
+    - Another option could be to open a web socket connection to Binance for each user on the backend
+    - One more option with the least latency could be to open a ws connection to Binance in browser
+
 - If tests pass docker images are built automatically by GithHub action and uploaded to Docker Hub
 
 ## Running
