@@ -20,7 +20,7 @@
     - Another option could be to open a web socket connection to Binance for each user on the backend
     - One more option with the least latency could be to open a ws connection to Binance in browser
 
-- If tests pass docker images are built automatically by GithHub action and uploaded to Docker Hub
+- If tests pass docker image is built automatically by GithHub action and uploaded to Docker Hub
 
 ## Running
 
