@@ -5,7 +5,7 @@ from typing import AsyncIterator
 import aiohttp
 
 from book.domain import OrderBook
-from book.events import consume
+from book.events import Event, consume
 
 
 async def get_order_book_snapshot(symbol: str) -> OrderBook:
@@ -46,15 +46,15 @@ async def stream_order_book(symbol: str) -> AsyncIterator[OrderBook]:
     events_buffer = []
     start = time()
 
-    async for event in consume("orderbook_updated", {"symbol": symbol}):
+    async for event in consume(Event.ORDERBOOK_UPDATED, {"symbol": symbol}):
         event.data["payload"]["a"] = dict(event.data["payload"]["a"])
         event.data["payload"]["b"] = dict(event.data["payload"]["b"])
 
         if not order_book:
             events_buffer.append(event)
 
-        # buffer 5 seconds of events
-        if time() - start > 5 and not order_book:
+        # buffer 3 seconds of events
+        if time() - start > 3 and not order_book:
             order_book = await _get_order_book_snapshot(symbol)
             for event in events_buffer:
                 order_book = _update_order_book(order_book, event.data["payload"])

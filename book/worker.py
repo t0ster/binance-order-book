@@ -12,13 +12,12 @@ async def emit_order_book_events(symbol: str):
     uri = f"wss://stream.binance.com:9443/ws/{_symbol}@depth"
 
     async with websockets.connect(uri) as websocket:  # type: ignore
-        async for event in websocket:
-            event = json.loads(event)
-            event = Event(
-                event="orderbook_updated",
-                data={"symbol": symbol, "payload": event},
-            )
-            await emit(event)
+        async for event_data in websocket:
+            event_data = {
+                "symbol": symbol,
+                "payload": json.loads(event_data),
+            }
+            await emit(Event.ORDERBOOK_UPDATED, event_data)
 
 
 async def main():

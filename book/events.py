@@ -1,32 +1,39 @@
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
+from enum import StrEnum, auto
+from typing import AsyncIterator
 
 from pymongo.errors import PyMongoError
 
 from book.config import mongo, settings
 
 
+class Event(StrEnum):
+    ORDERBOOK_UPDATED = auto()
+
+
 @dataclass(frozen=True)
-class Event:
+class EventInfo:
     event: str
     data: dict
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime
 
 
-async def emit(event: Event):
-    await mongo[settings.DB_NAME].events.insert_one(asdict(event))
+async def emit(event: Event, data: dict):
+    event_doc = {"event": event, "data": data, "timestamp": datetime.utcnow()}
+    await mongo[settings.DB_NAME].events.insert_one(event_doc)
 
 
-async def consume(event_name: str, data_match: dict = {}):
+async def consume(event: Event, data_match: dict = {}) -> AsyncIterator[EventInfo]:
     collection = mongo[settings.DB_NAME].events
 
     def transform(data: dict):
         del data["_id"]
-        return Event(**data)
+        return EventInfo(**data)
 
     match = {
         "operationType": "insert",
-        "fullDocument.event": event_name,
+        "fullDocument.event": event,
         **{f"fullDocument.data.{k}": v for k, v in data_match.items()},
     }
 
