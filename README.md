@@ -14,6 +14,7 @@
 - Uses HTMX on frontend
   - HTMX is a simple and elegant solution that allows to write UIs of almost the same complexity as frontend frameworks (like react, vue, etc) but much faster and with much lesser code and dependencies
 - Order book diff events are persisted in MongoDB
+  - This could be used to "replay" order book or build a heatmap (not implemented)
   - Uses [MongoDB watch](https://www.mongodb.com/docs/manual/reference/method/db.collection.watch/) mechanism to consume events and stream them to client
 - If tests pass docker images are built automatically by GithHub action and uploaded to Docker Hub
 
