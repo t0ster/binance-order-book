@@ -46,7 +46,7 @@ jobs:
       - name: "Run Tests"
         run: docker run --rm -v $(pwd):/test-results t0ster/binance-order-book:test pytest --junitxml /test-results/test-results/test-results.xml
       - name: Publish Tests
-        uses: docker://ghcr.io/enricomi/publish-unit-test-result-action:v1.6
+        uses: EnricoMi/publish-unit-test-result-action@v2
         if: always() # Or use "continue-on-error: true" in previous test step
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
