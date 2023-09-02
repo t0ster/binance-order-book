@@ -10,7 +10,8 @@ router = APIRouter()
 @router.get("/")
 async def index(request: Request):
     return templates.TemplateResponse(
-        "order-book.html", {"request": request, "symbol": settings.SYMBOL}
+        "order-book.html",
+        {"request": request, "symbol": settings.SYMBOL, "page_title": "Order Book"},
     )
 
 

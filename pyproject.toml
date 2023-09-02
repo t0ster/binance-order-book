@@ -20,7 +20,13 @@ motor = "^3.3.0"
 [tool.poetry.group.dev.dependencies]
 ipdb = "^0.13.13"
 mypy = "^1.5.1"
+pytest = "^7.4.0"
+pytest-asyncio = "^0.21.1"
+pytest-mock = "^3.11.1"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
